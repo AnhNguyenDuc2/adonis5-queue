@@ -67,21 +67,33 @@ export default class Queue implements Queue {
 	 * @param  {App/Job} job Job producer
 	 * @return {Promise<Response>}
 	 */
-	public remove(job: JobMakerInterface) {
-		return new Promise((resolve, reject) => {
-			this.queue.removeJob(job.kueJob.id, (error, response) => {
-				if (error) {
-					reject(error)
-				} else {
-					// send the onRemove event
-					if (job['onRemove']) {
-						job['onRemove'](job.job.type)
-					}
-					resolve(response)
-				}
-			})
-		})
-	}
+	public remove(job) {
+        return new Promise((resolve, reject) => {
+            if (job.job.kueJob.id == null) {
+                console.log(job.job.kueJob)
+                return
+            }
+            try {
+                    this.queue.removeJob(job.job.kueJob.id, (error, response) => {
+                        console.log("JOB TYPE =" + job.job.kueJob.type )
+                        if (error) {
+                            reject(error);
+                        }
+                        else {
+                            // send the onRemove event
+                            if (job['onRemove']) {
+                                job['onRemove'](job.job.type);
+                            }
+                            resolve(response);
+                        }
+                    
+                });
+            } catch (e) {
+                console.log(e)
+            }
+            
+        });
+    }
 
 	/**
 	 * Clear all jobs within a queue for a clean start
